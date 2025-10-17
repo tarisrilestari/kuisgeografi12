@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Interaktif Profesional</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===================================================================
+           CSS: Desain Elegan, Modern, Responsif (Biru-Putih)
+           =================================================================== */
+
+        :root {
+            --primary-color: #2a7ffc; /* Biru Primer yang Cerah */
+            --secondary-color: #f0f4f8; /* Putih/Abu-abu Muda untuk Latar */
+            --text-color: #333333;
+            --light-blue: #e3f2fd; /* Biru Sangat Muda */
+            --success-color: #4CAF50;
+            --warning-color: #FF9800;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            transition: all 0.5s ease-in-out;
+        }
+
+        /* Header */
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        /* Tombol & Input */
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.1s;
+            margin: 5px;
+            text-decoration: none; /* Untuk tombol download */
+            display: inline-block;
+        }
+
+        .btn:hover:not(:disabled) {
+            background-color: #1a60cc;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        /* Card Soal */
+        #quiz-container, #result-container {
+            min-height: 300px; /* Minimal tinggi agar tidak 'meloncat' */
+        }
+        
+        .question-card {
+            background-color: var(--light-blue);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            /* Transisi untuk animasi halus antar soal (Opacity & Transform) */
+            opacity: 1;
+            transform: translateX(0);
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+        }
+
+        .question-card h3 {
+            margin-bottom: 15px;
+            font-size: 1.15em;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* Opsi Jawaban (Pilihan Ganda) */
+        .options-list {
+            list-style: none;
+        }
+
+        .option-item {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .option-label {
+            display: block;
+            padding: 12px;
+            background-color: #ffffff;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .option-label:hover {
+            background-color: var(--light-blue);
+            border-color: var(--primary-color);
+        }
+
+        .option-label input[type="radio"] {
+            margin-right: 10px;
+            accent-color: var(--primary-color);
+            /* Sembunyikan radio button bawaan dan gunakan styling label */
+            opacity: 0;
+            position: absolute;
+            left: -9999px;
+        }
+
+        /* Style untuk opsi yang dipilih */
+        input[type="radio"]:checked + .option-label {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Indikator Navigasi */
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .question-indicator {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Tampilan Hasil */
+        .result-message {
+            text-align: center;
+            padding: 30px;
+            border-radius: 12px;
+            background-color: var(--light-blue);
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .result-message h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .result-message p {
+            font-size: 1.2em;
+        }
+
+        .score-display {
+            font-size: 3em;
+            font-weight: 700;
+            color: var(--success-color);
+            margin: 20px 0;
+        }
+
+        /* Pesan Awal/Sudah Selesai */
+        .info-card {
+            padding: 30px;
+            text-align: center;
+            background-color: var(--warning-color);
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        /* Responsif */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .btn {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+
+            .navigation {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-buttons {
+                width: 100%;
+                justify-content: space-around;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Kuis Perkembangan Wilayah & Revolusi Industri</h1>
+        <p style="text-align: center; margin-bottom: 20px;">Latihan Online untuk Siswa</p>
+
+        <div id="finished-message" class="info-card" style="display: none;">
+            Kamu sudah menyelesaikan kuis ini. Terima kasih! 🎉
+        </div>
+
+        <div id="start-section">
+            <label for="student-name" style="display: block; margin-bottom: 5px;">Masukkan Nama Lengkap:</label>
+            <input type="text" id="student-name" placeholder="Nama Siswa">
+            <button id="start-quiz-btn" class="btn" style="width: 100%;">Mulai Kuis Sekarang</button>
+            <button id="download-results-btn" class="btn" style="width: 100%; margin-top: 15px; background-color: var(--success-color);" onclick="downloadCSV()">Download Hasil Kuis (.csv)</button>
+        </div>
+
+        <div id="quiz-section" style="display: none;">
+            <div class="navigation" style="border: none; padding: 0;">
+                <span id="question-indicator" class="question-indicator"></span>
+            </div>
+
+            <div id="quiz-container">
+                </div>
+
+            <div class="navigation">
+                <div class="nav-buttons">
+                    <button id="prev-btn" class="btn" disabled>&#9664; Sebelumnya</button>
+                    <button id="next-btn" class="btn">Selanjutnya &#9654;</button>
+                </div>
+                <button id="submit-btn" class="btn" style="background-color: var(--success-color); display: none;">Kirim Jawaban</button>
+            </div>
+        </div>
+
+        <div id="result-section" style="display: none;">
+            <div id="result-container" class="result-message">
+                <h2>🎉 Kuis Selesai!</h2>
+                <p>Nama: <span id="final-name"></span></p>
+                <div id="score-display" class="score-display"></div>
+                <p id="motivational-message">Kerja bagus! Terus tingkatkan kemampuanmu 💪</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ===================================================================
+           JAVASCRIPT: Fungsionalitas Kuis & Penyimpanan Data
+           =================================================================== */
+
+        // Data 50 Soal (disini disederhanakan menjadi 5 soal untuk demo)
+        // Kuantitas soal dapat ditambah hingga 50 sesuai permintaan.
+        const quizQuestions = [
+            {
+                question: "Apa nama peristiwa perubahan cara produksi secara besar-besaran dengan penemuan mesin uap?",
+                options: ["Renaisans", "Reformasi", "Revolusi Industri", "Kolonialisme", "Merkantilisme"],
+                answer: "Revolusi Industri"
+            },
+            {
+                question: "Tokoh yang dikenal sebagai penemu mesin uap yang disempurnakan adalah...",
+                options: ["Isaac Newton", "Galileo Galilei", "James Watt", "Thomas Alfa Edison", "Nicola Tesla"],
+                answer: "James Watt"
+            },
+            {
+                question: "Salah satu dampak utama Revolusi Industri terhadap ruang muka bumi adalah munculnya...",
+                options: ["Lahan pertanian yang luas", "Kota-kota industri (urbanisasi)", "Sistem barter", "Kekuatan militer berbasis kavaleri", "Penyakit menular yang hilang"],
+                answer: "Kota-kota industri (urbanisasi)"
+            },
+            {
+                question: "Pencemaran udara akibat limbah pabrik adalah contoh pengaruh negatif revolusi industri terhadap...",
+                options: ["Sosial", "Politik", "Ekonomi", "Lingkungan", "Budaya"],
+                answer: "Lingkungan"
+            },
+            {
+                question: "Konsep yang menggambarkan suatu wilayah menjadi pusat pertumbuhan ekonomi dan menarik penduduk disebut...",
+                options: ["Desentralisasi", "Konservasi", "Pusat Pertumbuhan", "Homogenitas", "Subsistensi"],
+                answer: "Pusat Pertumbuhan"
+            },
+            // Tambahkan 45 soal lainnya di sini...
+        ];
+
+        // Variabel Status Kuis
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        const KEY_STORAGE = 'quiz_results_data';
+        const KEY_FINISHED = 'quiz_finished_status';
+
+        // Mendapatkan elemen DOM
+        const startSection = document.getElementById('start-section');
+        const startButton = document.getElementById('start-quiz-btn');
+        const quizSection = document.getElementById('quiz-section');
+        const quizContainer = document.getElementById('quiz-container');
+        const resultSection = document.getElementById('result-section');
+        const questionIndicator = document.getElementById('question-indicator');
+        const prevButton = document.getElementById('prev-btn');
+        const nextButton = document.getElementById('next-btn');
+        const submitButton = document.getElementById('submit-btn');
+        const studentNameInput = document.getElementById('student-name');
+        const finishedMessage = document.getElementById('finished-message');
+        const downloadResultsBtn = document.getElementById('download-results-btn');
+
+        // ===================================
+        // 1. Cek Status Kuis Awal
+        // ===================================
+
+        // Jalankan saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            checkQuizStatus();
+            // Ambil jawaban tersimpan (jika ada) untuk navigasi
+            const savedAnswers = localStorage.getItem('user_answers');
+            if (savedAnswers) {
+                userAnswers = JSON.parse(savedAnswers);
+            }
+        });
+
+        function checkQuizStatus() {
+            // Cek apakah kuis sudah selesai oleh pengguna ini
+            if (localStorage.getItem(KEY_FINISHED) === 'true') {
+                startSection.style.display = 'none';
+                quizSection.style.display = 'none';
+                resultSection.style.display = 'none';
+                finishedMessage.style.display = 'block';
+                return true; // Kuis sudah selesai
+            }
+            // Tampilkan tombol download hasil hanya di awal (simulasi mode guru/admin)
+            downloadResultsBtn.style.display = 'block'; 
+            return false; // Kuis belum selesai
+        }
+
+        // ===================================
+        // 2. Logika Mulai Kuis
+        // ===================================
+
+        startButton.addEventListener('click', () => {
+            const name = studentNameInput.value.trim();
+            if (!name) {
+                alert("Mohon masukkan nama Anda untuk memulai kuis.");
+                return;
+            }
+
+            // Nonaktifkan start button dan input nama
+            startButton.disabled = true;
+            studentNameInput.disabled = true;
+            startSection.style.display = 'none';
+            downloadResultsBtn.style.display = 'none';
+
+            // Tampilkan bagian kuis
+            quizSection.style.display = 'block';
+
+            // Inisialisasi array jawaban jika belum ada
+            if (userAnswers.length !== quizQuestions.length) {
+                userAnswers = Array(quizQuestions.length).fill(null);
+            }
+
+            // Tampilkan soal pertama
+            renderQuestion(currentQuestionIndex);
+        });
+
+        // ===================================
+        // 3. Render Soal
+        // ===================================
+
+        function renderQuestion(index) {
+            // Animasi Transisi Halus: Hilangkan card saat ini
+            const currentCard = document.querySelector('.question-card');
+            if (currentCard) {
+                currentCard.style.opacity = '0';
+                currentCard.style.transform = index > currentQuestionIndex ? 'translateX(-50px)' : 'translateX(50px)';
+                setTimeout(() => {
+                    displayNewQuestion(index);
+                }, 400); // Tunggu 400ms untuk transisi
+            } else {
+                displayNewQuestion(index);
+            }
+        }
+
+        function displayNewQuestion(index) {
+            currentQuestionIndex = index;
+            const questionData = quizQuestions[index];
+
+            // 1. Update Indikator Soal
+            questionIndicator.textContent = `Soal ${index + 1} dari ${quizQuestions.length}`;
+
+            // 2. Buat HTML Soal
+            let optionsHTML = '<ul class="options-list">';
+            const optionLabels = ['A', 'B', 'C', 'D', 'E'];
+
+            questionData.options.forEach((option, i) => {
+                const isChecked = userAnswers[index] === option;
+                // Radio button untuk menyimpan jawaban
+                optionsHTML += `
+                    <li class="option-item">
+                        <input type="radio" id="q${index}-opt${i}" name="q${index}" value="${option}" ${isChecked ? 'checked' : ''} onchange="saveAnswer(${index}, '${option.replace(/'/g, "\\'")}')">
+                        <label for="q${index}-opt${i}" class="option-label">
+                            ${optionLabels[i]}. ${option}
+                        </label>
+                    </li>
+                `;
+            });
+            optionsHTML += '</ul>';
+
+            const questionHTML = `
+                <div class="question-card" style="opacity: 0; transform: translateX(0);">
+                    <h3>${questionData.question}</h3>
+                    ${optionsHTML}
+                </div>
+            `;
+
+            // 3. Inject HTML baru dan terapkan animasi masuk
+            quizContainer.innerHTML = questionHTML;
+            setTimeout(() => {
+                const newCard = document.querySelector('.question-card');
+                if (newCard) {
+                    newCard.style.opacity = '1';
+                    newCard.style.transform = 'translateX(0)';
+                }
+            }, 10);
+
+            // 4. Update Status Tombol Navigasi
+            updateNavButtons();
+
+            // 5. Nonaktifkan opsi yang sudah dijawab (setelah dijawab pertama kali)
+            // Kunci jawaban setelah lanjut ke soal berikutnya
+            if (userAnswers[index] !== null) {
+                const radios = document.querySelectorAll(`input[name="q${index}"]`);
+                radios.forEach(radio => radio.disabled = true);
+            }
+        }
+
+        // ===================================
+        // 4. Logika Navigasi dan Jawaban
+        // ===================================
+
+        function saveAnswer(index, answer) {
+            // Pastikan soal belum dikunci (jika navigasi kembali)
+            if (userAnswers[index] === null || userAnswers[index] === answer) {
+                userAnswers[index] = answer;
+                // Simpan ke localStorage untuk mencegah kehilangan data saat refresh (meskipun kuis 1x)
+                localStorage.setItem('user_answers', JSON.stringify(userAnswers));
+                // Update tombol 'Selanjutnya' setelah ada jawaban
+                updateNavButtons();
+            }
+        }
+
+        function updateNavButtons() {
+            // Tombol 'Sebelumnya'
+            prevButton.disabled = currentQuestionIndex === 0;
+
+            // Tombol 'Selanjutnya'
+            // Aktif jika ada jawaban ATAU ini bukan soal terakhir
+            const hasAnswered = userAnswers[currentQuestionIndex] !== null;
+            const isLastQuestion = currentQuestionIndex === quizQuestions.length - 1;
+
+            if (isLastQuestion) {
+                nextButton.style.display = 'none';
+                submitButton.style.display = hasAnswered ? 'inline-block' : 'none';
+                submitButton.disabled = !hasAnswered;
+            } else {
+                nextButton.style.display = 'inline-block';
+                submitButton.style.display = 'none';
+                // Wajib jawab sebelum lanjut ke soal berikutnya
+                nextButton.disabled = !hasAnswered; 
+            }
+        }
+
+        // Event Listener Navigasi
+        prevButton.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                renderQuestion(currentQuestionIndex - 1);
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (currentQuestionIndex < quizQuestions.length - 1 && userAnswers[currentQuestionIndex] !== null) {
+                // Kunci jawaban di soal saat ini
+                const radios = document.querySelectorAll(`input[name="q${currentQuestionIndex}"]`);
+                radios.forEach(radio => radio.disabled = true);
+                
+                renderQuestion(currentQuestionIndex + 1);
+            }
+        });
+
+        // ===================================
+        // 5. Logika Kirim Jawaban & Penilaian
+        // ===================================
+
+        submitButton.addEventListener('click', () => {
+            if (confirm("Apakah Anda yakin ingin mengirim semua jawaban? Kuis hanya bisa dikerjakan 1 kali.")) {
+                // Kunci jawaban di soal terakhir
+                const radios = document.querySelectorAll(`input[name="q${currentQuestionIndex}"]`);
+                radios.forEach(radio => radio.disabled = true);
+                
+                calculateScoreAndDisplayResult();
+            }
+        });
+
+        function calculateScoreAndDisplayResult() {
+            let correctCount = 0;
+            const totalQuestions = quizQuestions.length;
+
+            quizQuestions.forEach((q, index) => {
+                if (userAnswers[index] === q.answer) {
+                    correctCount++;
+                }
+            });
+
+            // Hitung skor (misalnya, 100/50 = 2 poin per soal)
+            const score = (100 / totalQuestions) * correctCount; 
+            const formattedScore = score.toFixed(0); // Bulatkan ke integer terdekat
+
+            // 1. Tampilkan Hasil
+            document.getElementById('final-name').textContent = studentNameInput.value;
+            document.getElementById('score-display').textContent = `Skor Anda: ${formattedScore} (${correctCount} dari ${totalQuestions})`;
+            
+            // 2. Simpan Hasil
+            const resultData = {
+                name: studentNameInput.value,
+                score: formattedScore,
+                correct: correctCount,
+                total: totalQuestions,
+                date: new Date().toLocaleDateString('id-ID'),
+                time: new Date().toLocaleTimeString('id-ID'),
+                finishTimestamp: Date.now()
+            };
+            saveResultToStorage(resultData);
+
+            // 3. Update Status Kuis Selesai di localStorage
+            localStorage.setItem(KEY_FINISHED, 'true');
+            localStorage.removeItem('user_answers'); // Hapus jawaban sementara
+
+            // 4. Nonaktifkan dan sembunyikan UI Kuis
+            submitButton.disabled = true;
+            prevButton.disabled = true;
+            nextButton.disabled = true;
+            quizSection.style.display = 'none';
+
+            // 5. Tampilkan Bagian Hasil
+            resultSection.style.display = 'block';
+            
+            // Tampilkan tombol download hasil lagi di akhir (untuk demo, seharusnya hanya muncul untuk guru)
+            downloadResultsBtn.style.display = 'block'; 
+        }
+
+        // ===================================
+        // 6. Penyimpanan Data Hasil (localStorage)
+        // ===================================
+
+        function saveResultToStorage(newResult) {
+            const currentResults = JSON.parse(localStorage.getItem(KEY_STORAGE) || '[]');
+            currentResults.push(newResult);
+            localStorage.setItem(KEY_STORAGE, JSON.stringify(currentResults));
+        }
+        
+        // ===================================
+        // 7. Download CSV (Fitur Guru/Admin)
+        // ===================================
+        
+        function downloadCSV() {
+            const results = JSON.parse(localStorage.getItem(KEY_STORAGE) || '[]');
+            
+            if (results.length === 0) {
+                alert("Belum ada data hasil kuis yang tersimpan.");
+                return;
+            }
+
+            // Header CSV
+            let csvContent = "Nama,Skor,Waktu Selesai,Tanggal\n";
+
+            // Isi CSV
+            results.forEach(item => {
+                const row = [
+                    `"${item.name.replace(/"/g, '""')}"`, // Bungkus nama dengan quote untuk menghindari masalah koma
+                    item.score,
+                    item.time,
+                    item.date
+                ].join(",");
+                csvContent += row + "\n";
+            });
+
+            // Buat Blob dan Link untuk Download
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'hasil_kuis.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            alert(`Berhasil mendownload ${results.length} hasil kuis.`);
+        }
+
+    </script>
+</body>
+</html>
